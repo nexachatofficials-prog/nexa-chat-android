@@ -32,7 +32,7 @@ jobs:
           import os, glob, pathlib, textwrap
           from PIL import Image, ImageDraw
 
-          os.makedirs("app/src/main/java/com/imr/nexachat", exist_ok=True)
+          os.makedirs("app/src/main/java/com/nexachats/app", exist_ok=True)
           os.makedirs("app/src/main/res/values", exist_ok=True)
           os.makedirs("app/src/main/res/mipmap-anydpi-v26", exist_ok=True)
 
@@ -140,11 +140,11 @@ jobs:
               }
 
               android {
-                  namespace 'com.imr.nexachat'
+                  namespace 'com.nexachats.app'
                   compileSdk 34
 
                   defaultConfig {
-                      applicationId "com.imr.nexachat"
+                      applicationId "com.nexachats.app"
                       minSdk 24
                       targetSdk 34
                       versionCode 3
@@ -198,7 +198,7 @@ jobs:
                     "client_info": {
                       "mobilesdk_app_id": "1:839828901701:android:09e2b35ec8f3e67de2f82c",
                       "android_client_info": {
-                        "package_name": "com.imr.nexachat"
+                        "package_name": "com.nexachats.app"
                       }
                     },
                     "oauth_client": [],
@@ -263,8 +263,8 @@ jobs:
               </manifest>
           ''').strip() + "\n")
 
-          pathlib.Path("app/src/main/java/com/imr/nexachat/MainActivity.java").write_text(textwrap.dedent(r'''
-              package com.imr.nexachat;
+          pathlib.Path("app/src/main/java/com/nexachats/app/MainActivity.java").write_text(textwrap.dedent(r'''
+              package com.nexachats.app;
 
               import android.Manifest;
               import android.annotation.SuppressLint;
@@ -666,8 +666,8 @@ jobs:
               }
           ''').strip() + "\n")
 
-          pathlib.Path("app/src/main/java/com/imr/nexachat/NexaFirebaseMessagingService.java").write_text(textwrap.dedent(r'''
-              package com.imr.nexachat;
+          pathlib.Path("app/src/main/java/com/nexachats/app/NexaFirebaseMessagingService.java").write_text(textwrap.dedent(r'''
+              package com.nexachats.app;
 
               import com.google.firebase.messaging.FirebaseMessagingService;
               import com.google.firebase.messaging.RemoteMessage;
@@ -816,7 +816,7 @@ jobs:
                   <key>CFBundleExecutable</key>
                   <string>NexaChat</string>
                   <key>CFBundleIdentifier</key>
-                  <string>com.imr.nexachat</string>
+                  <string>com.nexachats.app</string>
                   <key>CFBundleInfoDictionaryVersion</key>
                   <string>6.0</string>
                   <key>CFBundleName</key>
@@ -987,7 +987,7 @@ jobs:
                       return true
                   }
 
-                  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+                  func userNotificationCenter(_ center: UNNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
                       completionHandler([.banner, .sound, .badge])
                   }
               }
