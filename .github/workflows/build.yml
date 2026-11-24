@@ -147,8 +147,8 @@ jobs:
                       applicationId "com.nexachats.app"
                       minSdk 24
                       targetSdk 34
-                      versionCode 3
-                      versionName "3.0"
+                      versionCode 4
+                      versionName "4.0"
                   }
 
                   signingConfigs {
@@ -696,17 +696,32 @@ jobs:
               }
           ''').strip() + "\n")
 
-      - name: Generate Release Keystore
+      - name: Prepare Release Keystore
+        id: keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          keytool -genkeypair -v \
-            -keystore app/release-key.jks \
-            -alias nexachat \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass nexachatpass \
-            -keypass nexachatpass \
-            -dname "CN=NexaChat, OU=IMR, O=IMR, L=City, S=State, C=IN"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > app/release-key.jks
+            echo "generated=false" >> "$GITHUB_OUTPUT"
+          else
+            keytool -genkeypair -v \
+              -keystore app/release-key.jks \
+              -alias nexachat \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass nexachatpass \
+              -keypass nexachatpass \
+              -dname "CN=NexaChat, OU=IMR, O=IMR, L=City, S=State, C=IN"
+            keytool -export -rfc \
+              -keystore app/release-key.jks \
+              -alias nexachat \
+              -storepass nexachatpass \
+              -file app/upload_certificate.pem
+            base64 -w 0 app/release-key.jks > app/keystore_base64.txt
+            echo "generated=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Install Gradle 8.5 & Build Signed Release APK & AAB
         run: |
@@ -727,8 +742,19 @@ jobs:
           name: NEXA-CHAT-Signed-AAB
           path: app/build/outputs/bundle/release/*.aab
 
+      - name: Upload Keystore & Play Console Certificate
+        if: steps.keystore.outputs.generated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEXA-CHAT-Keystore-And-Cert
+          path: |
+            app/release-key.jks
+            app/upload_certificate.pem
+            app/keystore_base64.txt
+
   build_ios:
-    runs-on: macos-latest
+    runs-on: macos-15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout Repository
@@ -824,9 +850,9 @@ jobs:
                   <key>CFBundlePackageType</key>
                   <string>APPL</string>
                   <key>CFBundleShortVersionString</key>
-                  <string>3.0</string>
+                  <string>4.0</string>
                   <key>CFBundleVersion</key>
-                  <string>3</string>
+                  <string>4</string>
                   <key>MinimumOSVersion</key>
                   <string>15.0</string>
                   <key>LSRequiresIPhoneOS</key>
